@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimización y Aceleración de Windows 10 y 11 — Tutorial</title>
+<meta name="description" content="Guía definitiva y manual integral para optimizar Windows 10 y 11 sin programas de terceros. Métodos nativos, paso a paso, con 33 preguntas y respuestas.">
+<style>
+/* ============ RESET Y VARIABLES ============ */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+:root {
+  --bg: #0a0e1a;
+  --card: #0f172a;
+  --card2: #0d1524;
+  --border: #1e3a5f;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent2: #00d4ff;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+body.light {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --card2: #eff3fa;
+  --border: #d0dae8;
+  --text: #0f172a;
+  --muted: #4a5568;
+  --accent: #0284c7;
+  --accent2: #0891b2;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  padding-top: 58px;
+  transition: background .2s, color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .6em; }
+h1 { font-size: 1.9rem; letter-spacing: -.01em; }
+h2 { font-size: 1.5rem; margin-top: 1.8em; padding-bottom: .4em; border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.18rem; margin-top: 1.4em; color: var(--accent); }
+h4 { font-size: 1.05rem; }
+p { margin: .6em 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { color: var(--text); }
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+code { background: var(--card2); padding: 2px 6px; border-radius: 4px; font-size: .88em; border: 1px solid var(--border); }
+pre { background: var(--card2); padding: 12px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+ul, ol { padding-left: 1.4em; }
+
+/* ============ NAV ============ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 58px;
+  display: flex; align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  z-index: 30;
+}
+nav .chips {
+  display: flex; gap: 8px;
+  overflow-x: auto; flex: 1;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+nav .chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  min-height: 42px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+  font-family: inherit;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.on { background: rgba(56,189,248,.15); border-color: var(--accent); color: var(--accent2); }
+.chip:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+#mb { background: rgba(56,189,248,.1); border-color: var(--accent); flex-shrink: 0; }
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.05); }
+#progbar { height: 100%; width: 0%; background: linear-gradient(90deg, #38bdf8, #00d4ff); transition: width .1s; }
+
+/* ============ DRAWER ============ */
+#dr {
+  position: fixed;
+  top: 58px; left: 0; bottom: 0;
+  width: min(330px, 88vw);
+  background: #0f172a;
+  border-right: 1px solid #1e3a5f;
+  transform: translateX(-105%);
+  transition: transform .25s ease;
+  z-index: 25;
+  overflow-y: auto;
+  padding: 12px 10px;
+  -webkit-overflow-scrolling: touch;
+}
+body.light #dr { background: #ffffff; border-right: 1px solid #d0dae8; }
+#dr.o { transform: none; box-shadow: 4px 0 30px rgba(0,0,0,.5); }
+#dr a {
+  display: flex; align-items: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #e2e8f0;
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-size: .95rem;
+  transition: background .15s;
+}
+body.light #dr a { color: #0f172a; }
+#dr a:hover { background: rgba(255,255,255,.05); }
+body.light #dr a:hover { background: rgba(0,0,0,.05); }
+#dr a.on { background: rgba(0,212,255,.15); color: #00d4ff; font-weight: 600; }
+body.light #dr a.on { background: rgba(2,132,199,.12); color: #0284c7; }
+
+/* ============ MAIN ============ */
+main { max-width: 980px; margin: 0 auto; padding: 20px 16px 100px; }
+.sec { display: none; animation: fadeIn .35s ease; }
+.sec.on { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+}
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid .card { margin: 0; }
+
+.pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(56,189,248,.12);
+  color: var(--accent2);
+  font-size: .8rem;
+  font-weight: 600;
+  margin: 0 4px 4px 0;
+}
+.pill-row { margin: 10px 0 20px; }
+
+.lead { font-size: 1.05rem; color: var(--muted); }
+
+.callout {
+  border-left: 4px solid var(--accent);
+  background: rgba(56,189,248,.06);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 14px 0;
+}
+.callout.warn { border-color: var(--warn); background: rgba(251,191,36,.06); }
+.callout.danger { border-color: var(--danger); background: rgba(248,113,113,.06); }
+.callout.ok { border-color: var(--ok); background: rgba(52,211,153,.06); }
+
+.steps { padding-left: 1.4em; margin: 12px 0; }
+.steps li { margin-bottom: 10px; padding-left: 6px; }
+.steps li::marker { color: var(--accent2); font-weight: 700; }
+
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+table th, table td { padding: 10px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+table th { background: rgba(56,189,248,.08); font-weight: 700; }
+
+details.qa-item {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+details.qa-item > summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-height: 44px;
+  transition: background .15s;
+}
+details.qa-item > summary:hover { background: rgba(56,189,248,.05); }
+details.qa-item > summary::-webkit-details-marker { display: none; }
+details.qa-item > summary::before {
+  content: '▸';
+  color: var(--accent);
+  display: inline-block;
+  transition: transform .2s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+details.qa-item[open] > summary::before { transform: rotate(90deg); }
+details.qa-item > .qa-a { padding: 0 16px 16px 40px; color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  min-height: 38px;
+  transition: all .15s;
+  text-decoration: none;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: #04121e; border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent2); color: #04121e; }
+.btn:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+
+.proc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+  margin: 1.2em 0 .4em;
+}
+.proc-head h3 { margin: 0; }
+
+.checklist { list-style: none; padding: 0; margin: 12px 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  background: var(--card2);
+}
+.checklist input[type=checkbox] {
+  width: 20px; height: 20px;
+  accent-color: var(--accent);
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checklist label { cursor: pointer; flex: 1; }
+.checklist input:checked + label { color: var(--muted); text-decoration: line-through; }
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1rem;
+  margin: 12px 0 20px;
+  font-family: inherit;
+}
+.search-input:focus { outline: 2px solid var(--accent2); border-color: var(--accent2); }
+
+/* ============ HERO SVG ============ */
+.hero-svg {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+  aspect-ratio: 16 / 10;
+  position: relative;
+}
+.hero-svg svg { display: block; width: 100%; height: 100%; }
+
+/* ============ TOOLBAR ============ */
+#toolbar {
+  position: fixed;
+  bottom: 16px; right: 16px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+  z-index: 20;
+}
+#toolbar button {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all .15s;
+  font-family: inherit;
+}
+#toolbar button:hover { background: var(--accent); color: #04121e; border-color: var(--accent); }
+#toolbar button:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+
+/* ============ AUTOR ============ */
+.author-block {
+  text-align: center;
+  padding: 24px 16px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 20px 0;
+}
+.author-block h2 {
+  font-size: 2rem;
+  color: var(--accent2);
+  border: none;
+  margin: 0 0 .2em;
+  padding: 0;
+}
+.author-block .role { color: var(--muted); font-size: 1rem; margin: 0; }
+
+/* ============ TOAST ============ */
+#toast {
+  position: fixed;
+  bottom: 80px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #04121e;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 640px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.3rem; }
+  h3 { font-size: 1.1rem; }
+  main { padding: 16px 12px 100px; }
+  .card { padding: 14px 12px; }
+  nav { padding: 6px 8px; gap: 6px; }
+  .chip { padding: 6px 10px; font-size: .78rem; min-height: 42px; }
+  details.qa-item > .qa-a { padding-left: 16px; }
+}
+
+/* ============ PRINT ============ */
+@media print {
+  @page { size: A4 portrait; margin: 14mm 12mm; }
+  html { font-size: 11pt; }
+  body { background: #fff !important; color: #000 !important; padding-top: 0 !important; }
+  nav, #dr, #toolbar, .no-print, #progbar, .progress { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .sec { display: block !important; }
+  .card { border: 1px solid #333 !important; box-shadow: none !important; page-break-inside: avoid; background: #fff !important; }
+  h1, h2, h3, h4, p, li, td, th, strong { color: #000 !important; }
+  h2 { border-color: #333 !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  th, td { border: 1px solid #333 !important; background: #fff !important; color: #000 !important; }
+  th { background: #eee !important; }
+  code, pre { background: #f4f4f4 !important; color: #000 !important; border: 1px solid #ccc; }
+  details { border: 1px solid #333 !important; background: #fff !important; }
+  details > summary { color: #000 !important; }
+  details > .qa-a { color: #333 !important; }
+  .hero-svg { border: 1px solid #333 !important; background: #fff !important; page-break-inside: avoid; }
+  .pill, .callout { background: #f4f4f4 !important; border: 1px solid #333 !important; color: #000 !important; }
+  .checklist li { border: 1px solid #333 !important; background: #fff !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav id="nav" aria-label="Barra de navegación principal">
+  <button class="chip" id="mb" aria-label="Abrir índice" aria-expanded="false" aria-controls="dr">☰ Índice</button>
+  <div class="chips" id="navchips">
+    <button class="chip on" data-i="0">INICIO</button>
+    <button class="chip" data-i="1">CONCEPTOS</button>
+    <button class="chip" data-i="2">PROCEDIMIENTO</button>
+    <button class="chip" data-i="3">PRÁCTICA</button>
+    <button class="chip" data-i="4">33 Preguntas (Q&amp;A)</button>
+    <button class="chip" data-i="5">ERRORES</button>
+    <button class="chip" data-i="6">RESUMEN</button>
+    <button class="chip" data-i="7">FUENTES</button>
+    <button class="chip" data-i="8">CRÉDITOS</button>
+  </div>
+  <div class="progress" aria-hidden="true"><div id="progbar"></div></div>
+</nav>
+
+<!-- ============ DRAWER ============ -->
+<div id="dr" role="navigation" aria-label="Índice de secciones" inert></div>
+
+<!-- ============ MAIN ============ -->
+<main>
+
+<!-- ============ INICIO ============ -->
+<section class="sec on" data-t="INICIO">
+  <div class="hero-svg" id="heroHome" aria-label="Ilustración animada del tema de optimización de Windows"></div>
+
+  <h1>Optimización y Aceleración de Windows 10 y 11 sin programas de terceros</h1>
+  <p class="lead">Guía definitiva y manual integral · Métodos 100 % nativos · Para principiantes y usuarios avanzados</p>
+
+  <div class="pill-row">
+    <span class="pill">Windows 10</span>
+    <span class="pill">Windows 11</span>
+    <span class="pill">Sin software externo</span>
+    <span class="pill">Basado en métodos de Rubén Sbarsky</span>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">¿Por dónde empiezo?</h2>
+    <p>Esta guía te enseña paso a paso cómo acelerar Windows usando únicamente las herramientas que ya vienen con el sistema. No necesitas descargar nada, ni instalar «limpiadores» ni «boosters» de terceros: <strong>todo lo que necesitas ya está dentro de Windows</strong>.</p>
+    <p>Si es tu primera vez, empieza por <strong>CONCEPTOS</strong> para entender qué ocurre dentro de tu equipo. Cuando quieras ponerte manos a la obra, ve a <strong>PROCEDIMIENTO</strong>. Si tienes una duda concreta, consulta las <strong>33 Preguntas (Q&amp;A)</strong>.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <button class="btn primary" onclick="go(2)">▶ Ir al procedimiento</button>
+      <button class="btn" onclick="go(1)">🧠 Ver conceptos</button>
+      <button class="btn" onclick="go(4)">❓ 33 Preguntas</button>
+      <button class="btn" id="ix" aria-label="Abrir índice de secciones">☰ Ver índice</button>
+    </div>
+  </div>
+
+  <h2>Qué vas a conseguir</h2>
+  <div class="grid">
+    <div class="card"><h3>⚡ Arranque más rápido</h3><p>Deshabilitar aplicaciones que no necesitas al inicio reduce el tiempo de encendido de forma notable.</p></div>
+    <div class="card"><h3>🧠 Menos consumo de RAM</h3><p>Eliminar procesos publicitarios y de telemetría libera memoria para tus aplicaciones reales.</p></div>
+    <div class="card"><h3>🎮 Menos latencia</h3><p>La Programación de GPU Acelerada por Hardware (HAGS) reduce el retardo visual en juegos y multimedia.</p></div>
+    <div class="card"><h3>💾 Más espacio libre</h3><p>El Sensor de Almacenamiento limpia temporales y caché de forma automática y segura.</p></div>
+  </div>
+
+  <div class="callout">
+    <strong>Regla de oro:</strong> ningún programa externo. Windows 10 y 11 ya incluyen todas las herramientas necesarias para ajustar, depurar y maximizar el rendimiento de tu equipo.
+  </div>
+
+  <h2>Cómo usar esta guía</h2>
+  <ol class="steps">
+    <li><strong>Lee los conceptos.</strong> Entiende qué es la CPU, la RAM, el disco, la GPU y por qué los planes de energía importan.</li>
+    <li><strong>Sigue los procedimientos en orden.</strong> Empieza por crear un punto de restauración. Después aplica los cinco procedimientos.</li>
+    <li><strong>Practica con los proyectos integradores.</strong> Dos escenarios reales: una laptop de oficina y un equipo de juegos.</li>
+    <li><strong>Consulta las 33 preguntas.</strong> Cada respuesta está clasificada por nivel: básico, avanzado y PRO.</li>
+    <li><strong>Ante un problema, revisa ERRORES.</strong> Encontrarás una tabla de solución de problemas con causas y soluciones paso a paso.</li>
+  </ol>
+</section>
+
+<!-- ============ CONCEPTOS ============ -->
+<section class="sec" data-t="CONCEPTOS">
+  <h1>Conceptos: cómo funciona el rendimiento en Windows</h1>
+  <p>Antes de tocar nada, entender <em>qué</em> estás cambiando y <em>por qué</em> importa te ahorrará errores. Esta sección explica los fundamentos sin tecnicismos innecesarios.</p>
+
+  <h2>1. Por qué evitar programas «optimizadores» de terceros</h2>
+  <p>Durante años se ha popularizado el uso de herramientas comercializadas como «aceleradores de PC», «limpiadores de registro» o «boosters de memoria». La evidencia técnica y las directrices oficiales de Microsoft demuestran que gran parte de estos programas producen el efecto opuesto al deseado:</p>
+  <ul>
+    <li><strong>Consumo constante de recursos:</strong> se ejecutan en segundo plano, añadiendo procesos adicionales que consumen memoria RAM y ciclos de CPU.</li>
+    <li><strong>Instalación de software no deseado:</strong> a menudo incluyen asistentes de instalación engañosos que introducen publicidad o aplicaciones secundarias.</li>
+    <li><strong>Inestabilidad del sistema:</strong> la eliminación indiscriminada de claves de registro suele provocar errores en aplicaciones nativas.</li>
+  </ul>
+  <div class="callout"><strong>Regla de oro:</strong> Windows 10 y Windows 11 incorporan internamente todas las herramientas necesarias para ajustar, depurar y maximizar el rendimiento del hardware sin necesidad de instalar software externo.</div>
+
+  <h2>2. Mitos y realidades sobre el rendimiento</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Mito 1: «Cuanta más RAM libre, más rápida es la PC»</h3>
+      <p><strong>Realidad:</strong> la RAM está diseñada para ser utilizada. El problema no es el uso de la RAM por procesos activos del usuario, sino la saturación provocada por procesos secundarios que se inician automáticamente sin autorización.</p>
+    </div>
+    <div class="card">
+      <h3>Mito 2: «Borrar la caché constantemente acelera la PC»</h3>
+      <p><strong>Realidad:</strong> la caché almacena datos procesados previamente para acelerar su apertura. Borrarla con demasiada frecuencia obliga a la CPU a reconstruir esos datos desde cero. Solo debe limpiarse cuando contiene archivos temporales obsoletos.</p>
+    </div>
+  </div>
+
+  <h2>3. Arquitectura del sistema: los cuatro componentes</h2>
+  <p>El rendimiento global de Windows depende del equilibrio entre cuatro componentes clave:</p>
+  <div class="grid">
+    <div class="card">
+      <h3>🧠 Procesador (CPU)</h3>
+      <p>Encargado de ejecutar las instrucciones de los programas. Si está sobrecargado por tareas publicitarias o en segundo plano, las aplicaciones tardarán en responder.</p>
+    </div>
+    <div class="card">
+      <h3>💾 Memoria RAM</h3>
+      <p>Espacio de trabajo de alta velocidad donde se cargan los programas abiertos. Si se satura, Windows recurre al disco (memoria virtual), mucho más lento.</p>
+    </div>
+    <div class="card">
+      <h3>💿 Almacenamiento (SSD o HDD)</h3>
+      <p>Si el disco está lleno a más del 85-90 % de su capacidad, Windows pierde la habilidad de gestionar eficientemente la memoria virtual.</p>
+    </div>
+    <div class="card">
+      <h3>🎮 Procesador gráfico (GPU)</h3>
+      <p>Encargado de renderizar la interfaz visual, ventanas, animaciones y gráficos 3D. Una mala gestión de la VRAM provoca lag visual.</p>
+    </div>
+  </div>
+
+  <h2>4. Telemetría, ofertas y procesos publicitarios</h2>
+  <p>Windows 10 y 11 incorporan funciones de recomendaciones, publicidad contextual y rastreo de identificadores que consumen constantemente ciclos de procesador, memoria RAM y ancho de banda en segundo plano. Desactivarlos no rompe el sistema: simplemente evita que tu equipo ejecute tareas de recopilación que no necesitas.</p>
+
+  <h2>5. HAGS y planes de energía</h2>
+  <h3>Planes de energía</h3>
+  <ul>
+    <li><strong>Economizador:</strong> limita la frecuencia del procesador y desactiva núcleos e hilos de procesamiento de forma agresiva. Provoca lentitud y tirones.</li>
+    <li><strong>Equilibrado:</strong> ajusta la velocidad del procesador según la demanda puntual, introduciendo pequeñas latencias al pasar de reposo a carga alta.</li>
+    <li><strong>Alto rendimiento:</strong> mantiene el procesador operando a su frecuencia base e impulsos de reloj máximos, desactivando el ahorro agresivo para ofrecer la máxima respuesta inmediata.</li>
+  </ul>
+  <h3>Programación de GPU Acelerada por Hardware (HAGS)</h3>
+  <p>Tradicionalmente, la CPU gestiona la asignación de memoria VRAM y las colas de trabajo gráfico. La tecnología HAGS (<em>Hardware-Accelerated GPU Scheduling</em>) delega esta administración directamente al procesador dedicado de la tarjeta gráfica, reduciendo la sobrecarga sobre la CPU y disminuyendo la latencia de entrada.</p>
+
+  <h2>6. Almacenamiento: el umbral crítico</h2>
+  <p>La acumulación indiscriminada de archivos temporales, reportes de error y residuos de actualizaciones degrada la velocidad de lectura y escritura del disco duro o unidad SSD. Especialmente en SSD, cuando el espacio libre cae por debajo del 10-15 %, se sobrecarga el proceso interno de recolección de basura del controlador y se pierde velocidad de escritura.</p>
+  <div class="callout warn"><strong>Importante:</strong> nunca dejes que el sistema borre automáticamente la carpeta <code>Descargas</code>. Ahí suelen guardarse instaladores y documentos personales que podrías necesitar.</div>
+</section>
+
+<!-- ============ PROCEDIMIENTO ============ -->
+<section class="sec" data-t="PROCEDIMIENTO">
+  <h1>Procedimientos paso a paso</h1>
+  <p>Cinco procedimientos nativos, en orden de seguridad y utilidad. Cada uno incluye objetivo, pasos numerados, resultado esperado y errores comunes.</p>
+
+  <div class="callout warn">
+    <strong>Antes de empezar:</strong> crea un Punto de Restauración. Es tu red de seguridad. Si algo sale mal, podrás revertir los cambios sin perder datos.
+  </div>
+
+  <div class="proc-head">
+    <h3>Procedimiento 0 — Punto de Restauración del Sistema</h3>
+    <button class="btn" onclick="copyEl('p0-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> guardar una instantánea del estado actual del sistema para poder volver atrás si algo falla.</p>
+  <ol class="steps" id="p0-steps">
+    <li>Presiona la tecla <code>Windows</code> o haz clic en la lupa de búsqueda de la barra de tareas.</li>
+    <li>Escribe exactamente: <code>Crear un punto de restauración</code> y selecciona la herramienta con el icono de un equipo.</li>
+    <li>En la ventana «Propiedades del sistema», asegúrate de que en <strong>Configuración de protección</strong> el disco local <code>(C:) (Sistema)</code> tenga el estado <strong>Activado</strong>.</li>
+    <li>Si está desactivado, haz clic en <strong>Configurar…</strong>, selecciona <strong>Activar protección del sistema</strong>, asigna un 5 % de uso de espacio y pulsa <strong>Aceptar</strong>.</li>
+    <li>Haz clic en el botón <strong>Crear…</strong> ubicado en la parte inferior derecha.</li>
+    <li>Asigna un nombre descriptivo, por ejemplo: <code>Antes_de_Optimizacion_Inicial</code>.</li>
+    <li>Haz clic en <strong>Crear</strong> y espera el mensaje «El punto de restauración se creó correctamente».</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> aparece un nuevo punto de restauración con la fecha y hora actuales en la lista.</p>
+
+  <div class="proc-head">
+    <h3>Procedimiento 1 — Gestión de procesos de inicio y memoria RAM</h3>
+    <button class="btn" onclick="copyEl('p1-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> impedir que programas innecesarios se ejecuten automáticamente al encender la PC.</p>
+  <ol class="steps" id="p1-steps">
+    <li>Haz <strong>clic derecho</strong> sobre un espacio en blanco de la barra de tareas (sin iconos).</li>
+    <li>En el menú contextual, selecciona <strong>Administrador de tareas</strong>. Alternativa por teclado: <code>Ctrl</code> + <code>Shift</code> + <code>Esc</code>.</li>
+    <li>En <strong>Windows 11</strong>, haz clic en el icono de velocímetro del panel izquierdo: <strong>Aplicaciones de arranque</strong>.</li>
+    <li>En <strong>Windows 10</strong>, haz clic en la pestaña superior <strong>Inicio</strong>.</li>
+    <li>Localiza una aplicación no esencial que muestre el estado <em>Habilitado</em> (mensajería, launchers de juegos, actualizadores).</li>
+    <li>Haz <strong>clic derecho</strong> sobre la fila de esa aplicación y selecciona <strong>Deshabilitar</strong>.</li>
+    <li>Repite el procedimiento para cada programa secundario que no necesites al arranque.</li>
+    <li>Cierra el Administrador de tareas.</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> el tiempo de encendido se reduce y el uso de RAM en reposo disminuye.</p>
+  <div class="callout"><strong>No deshabilites:</strong> Seguridad de Windows, notificaciones de seguridad, controladores de audio (Realtek) ni paneles gráficos (Intel, NVIDIA, AMD).</div>
+
+  <div class="proc-head">
+    <h3>Procedimiento 2 — Plan de energía de Alto Rendimiento</h3>
+    <button class="btn" onclick="copyEl('p2-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> configurar el procesador para que responda con la máxima fluidez posible.</p>
+  <ol class="steps" id="p2-steps">
+    <li>Haz clic en la lupa de búsqueda de la barra de tareas.</li>
+    <li>Escribe la frase exacta: <code>Editar plan de energía</code>.</li>
+    <li>Haz clic sobre la opción emergente del Panel de Control.</li>
+    <li>En la ventana que se abre, haz clic en <strong>Cambiar la configuración avanzada de energía</strong> (o selecciona <em>Opciones de energía</em> en la barra superior).</li>
+    <li>En la ventana emergente, despliega el menú de planes.</li>
+    <li>Selecciona <strong>Alto rendimiento</strong>.</li>
+    <li>Pulsa <strong>Aplicar</strong> y después <strong>Aceptar</strong>.</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> el plan activo pasa a ser <em>Alto rendimiento</em> y el sistema responde con menos latencia.</p>
+  <div class="callout warn"><strong>Laptops:</strong> con batería, el consumo eléctrico será ligeramente mayor. Cambia a <em>Equilibrado</em> cuando uses el portátil sin cargador.</div>
+
+  <div class="proc-head">
+    <h3>Procedimiento 3 — Desactivar telemetría, ofertas y publicidad</h3>
+    <button class="btn" onclick="copyEl('p3-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> cortar el envío de datos de uso, anuncios personalizados y rastreo publicitario.</p>
+  <ol class="steps" id="p3-steps">
+    <li>Pulsa <code>Windows</code> + <code>I</code> para abrir <strong>Configuración</strong>.</li>
+    <li>En el panel lateral izquierdo, haz clic en <strong>Privacidad y seguridad</strong>.</li>
+    <li>Desplázate hasta la subsección <em>Permisos de Windows</em> y haz clic en <strong>Recomendaciones y ofertas</strong> (en algunas versiones figura bajo <em>General</em>).</li>
+    <li>Desactiva los tres interruptores siguientes:
+      <ul>
+        <li><strong>Ofertas personalizadas.</strong></li>
+        <li><strong>Recomendaciones y ofertas en la aplicación Configuración.</strong></li>
+        <li><strong>Permitir que las aplicaciones usen el identificador de publicidad.</strong></li>
+      </ul>
+    </li>
+    <li>Regresa al menú principal de Configuración.</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> desaparecen los anuncios en la interfaz y se detiene el rastreo publicitario.</p>
+
+  <div class="proc-head">
+    <h3>Procedimiento 4 — Optimización gráfica y HAGS</h3>
+    <button class="btn" onclick="copyEl('p4-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> delegar la gestión de VRAM a la GPU y reducir la latencia de entrada.</p>
+  <ol class="steps" id="p4-steps">
+    <li>Pulsa <code>Windows</code> + <code>I</code> y ve a <strong>Sistema → Pantalla</strong>.</li>
+    <li>En la parte inferior, haz clic en <strong>Gráficos</strong>.</li>
+    <li>Si existe la opción <strong>Optimizaciones para juegos en ventana</strong>, actívala.</li>
+    <li>Haz clic en <strong>Cambiar la configuración gráfica predeterminada</strong> (o <em>Configuración avanzada de gráficos</em>).</li>
+    <li>Localiza <strong>Programación de GPU acelerada por hardware</strong> y actívala.</li>
+    <li>Si el sistema solicita reiniciar para aplicar los cambios, reinicia al finalizar todos los pasos.</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> menos microtirones en juegos y aplicaciones multimedia.</p>
+  <div class="callout danger"><strong>Si la opción HAGS no aparece:</strong> tu tarjeta gráfica o sus controladores no son compatibles. Actualiza el controlador oficial desde el sitio web del fabricante (NVIDIA, AMD o Intel).</div>
+
+  <div class="proc-head">
+    <h3>Procedimiento 5 — Sensor de Almacenamiento y limpieza manual</h3>
+    <button class="btn" onclick="copyEl('p5-steps')">📋 Copiar pasos</button>
+  </div>
+  <p><strong>Objetivo:</strong> automatizar la limpieza de archivos temporales y liberar espacio de forma segura.</p>
+  <ol class="steps" id="p5-steps">
+    <li>Haz clic en la lupa de búsqueda y escribe <code>Almacenamiento</code>.</li>
+    <li>Selecciona <strong>Configuración de almacenamiento</strong>.</li>
+    <li>Espera unos segundos a que el sistema calcule el uso de espacio.</li>
+    <li>Activa el <strong>Sensor de almacenamiento</strong>.</li>
+    <li>Entra en sus opciones avanzadas y configura:
+      <ul>
+        <li><strong>Ejecutar Sensor de almacenamiento:</strong> <em>Mientras haya poco espacio libre</em> o <em>Cada mes</em>.</li>
+        <li><strong>Eliminar archivos de la Papelera de reciclaje:</strong> <em>30 días</em>.</li>
+        <li><strong>Eliminar archivos de la carpeta Descargas:</strong> <strong>Nunca</strong>.</li>
+      </ul>
+    </li>
+    <li>Para una limpieza manual, haz clic en <strong>Archivos temporales</strong>.</li>
+    <li>Marca: <em>Archivos temporales de Internet</em>, <em>Papelera de reciclaje</em>, <em>Archivos de optimización de distribución</em>, <em>Caché del sombreador DirectX</em>, <em>Informes de errores</em> y <em>Miniaturas</em>.</li>
+    <li><strong>Verifica</strong> que la casilla <strong>Descargas</strong> esté <strong>desmarcada</strong>.</li>
+    <li>Pulsa <strong>Quitar archivos</strong> y confirma con <strong>Continuar</strong>.</li>
+  </ol>
+  <p><strong>Resultado esperado:</strong> se liberan varios GB de espacio basura sin afectar a archivos personales.</p>
+</section>
+
+<!-- ============ PRÁCTICA ============ -->
+<section class="sec" data-t="PRÁCTICA">
+  <h1>Proyectos integradores prácticos</h1>
+  <p>Dos escenarios reales. Sigue cada proyecto y marca las casillas para llevar tu progreso. El estado se guarda automáticamente en tu navegador.</p>
+
+  <h2>Proyecto A — Laptop de oficina / estudio</h2>
+  <p><strong>Escenario:</strong> equipo portátil con 8 GB de RAM y procesador de bajo consumo que presenta congelamientos al abrir el navegador y documentos.</p>
+  <ul class="checklist">
+    <li><input type="checkbox" id="pa1" data-key="pa1"><label for="pa1">Crear Punto de Restauración titulado <code>Restauracion_Oficina</code>.</label></li>
+    <li><input type="checkbox" id="pa2" data-key="pa2"><label for="pa2">Deshabilitar autostarts de mensajería, nube, reproductores y utilidades de impresora.</label></li>
+    <li><input type="checkbox" id="pa3" data-key="pa3"><label for="pa3">Configurar el Plan de Energía en <em>Alto rendimiento</em> mientras la laptop esté conectada al cargador.</label></li>
+    <li><input type="checkbox" id="pa4" data-key="pa4"><label for="pa4">Desactivar ofertas personalizadas e identificador de publicidad en Privacidad.</label></li>
+    <li><input type="checkbox" id="pa5" data-key="pa5"><label for="pa5">Activar el Sensor de Almacenamiento con purga a 30 días de la Papelera de Reciclaje.</label></li>
+  </ul>
+  <div class="callout ok"><strong>Resultado esperado:</strong> reducción del tiempo de encendido superior al 40 % y uso de RAM en reposo por debajo de 2,2 GB.</div>
+
+  <h2>Proyecto B — Equipo de escritorio para juegos y edición</h2>
+  <p><strong>Escenario:</strong> PC con tarjeta gráfica dedicada que experimenta pequeñas caídas de FPS (<em>stuttering</em>) en juegos.</p>
+  <ul class="checklist">
+    <li><input type="checkbox" id="pb1" data-key="pb1"><label for="pb1">Activar la <em>Programación de GPU Acelerada por Hardware (HAGS)</em> y las <em>Optimizaciones para juegos en ventana</em>.</label></li>
+    <li><input type="checkbox" id="pb2" data-key="pb2"><label for="pb2">Establecer el Plan de Energía en <em>Alto rendimiento</em> de forma permanente.</label></li>
+    <li><input type="checkbox" id="pb3" data-key="pb3"><label for="pb3">Deshabilitar todos los launchers secundarios en el Administrador de Tareas.</label></li>
+    <li><input type="checkbox" id="pb4" data-key="pb4"><label for="pb4">Realizar la depuración manual de la Caché del sombreador DirectX y archivos temporales.</label></li>
+  </ul>
+  <div class="callout ok"><strong>Resultado esperado:</strong> menor latencia de entrada y mayor estabilidad en la tasa de FPS mínimos.</div>
+
+  <h2>Ejercicio final integrador</h2>
+  <p><strong>Reto:</strong> diseña tu propio plan de optimización para un equipo que no hayas visto antes. Antes de aplicar nada, responde:</p>
+  <ol class="steps">
+    <li>¿Qué componentes afectan más al rendimiento en ese equipo? (CPU, RAM, disco o GPU)</li>
+    <li>¿Qué aplicaciones son imprescindibles al arranque? ¿Y cuáles secundarias?</li>
+    <li>¿Qué plan de energía corresponde al uso típico (oficina, juegos, edición, batería)?</li>
+    <li>¿Qué ajustes de privacidad y telemetría tienen sentido para ese perfil de usuario?</li>
+    <li>¿Cómo verificarás que la optimización ha funcionado? ¿Qué métricas usarás?</li>
+  </ol>
+  <p>Cuando tengas las respuestas, aplica los procedimientos 0 a 5 en el orden indicado. Guarda tu punto de restauración antes de empezar.</p>
+</section>
+
+<!-- ============ 33 PREGUNTAS (Q&A) ============ -->
+<section class="sec" data-t="33 Preguntas (Q&amp;A)">
+  <h1>33 Preguntas y Respuestas</h1>
+  <p>Banco completo de preguntas frecuentes, ordenadas por nivel: básico, avanzado y PRO. Pulsa cualquier pregunta para ver la respuesta.</p>
+
+  <input type="search" id="qaSearch" class="search-input" placeholder="🔍 Buscar pregunta o palabra clave…" aria-label="Buscar pregunta">
+
+  <h2>Nivel Básico (1 a 11)</h2>
+
+  <details class="qa-item"><summary>1. ¿Por qué se vuelve lenta una computadora con Windows con el paso del tiempo?</summary>
+    <div class="qa-a"><p>La lentitud se debe principalmente a la acumulación de programas que se configuran para iniciar automáticamente en segundo plano, la generación excesiva de archivos temporales y la saturación del almacenamiento principal.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>2. ¿Es necesario instalar programas limpiadores o «boosters» de terceros?</summary>
+    <div class="qa-a"><p>No. Los programas optimizadores de terceros suelen saturar la memoria RAM con procesos publicitarios, consumir recursos en segundo plano e inestabilizar el registro de Windows. Todas las herramientas necesarias ya están integradas de forma nativa en el sistema operativo.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>3. ¿Cómo abro el Administrador de Tareas si la barra de tareas no responde?</summary>
+    <div class="qa-a"><p>Puedes abrirlo presionando la combinación de teclas <code>Ctrl</code> + <code>Shift</code> + <code>Esc</code> de forma simultánea en tu teclado.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>4. ¿Qué es una aplicación de arranque o de inicio?</summary>
+    <div class="qa-a"><p>Es un programa que está programado para abrirse automáticamente en segundo plano al encender la computadora, consumiendo memoria RAM y procesador desde el primer momento.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>5. ¿Deshabilitar un programa en el inicio lo desinstala del equipo?</summary>
+    <div class="qa-a"><p>No. Deshabilitar una aplicación del inicio únicamente evita que se ejecute sola al encender la computadora. El programa sigue instalado y listo para usarse cuando tú decidas abrirlo manualmente.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>6. ¿Qué es el Sensor de Almacenamiento en Windows?</summary>
+    <div class="qa-a"><p>Es una función nativa de Windows 10 y 11 que limpia automáticamente archivos temporales e innecesarios cuando el espacio en disco comienza a agotarse.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>7. ¿Dónde se encuentra la opción de Editar Plan de Energía en Windows 10 y 11?</summary>
+    <div class="qa-a"><p>Se encuentra en el Panel de Control de Windows. La forma más rápida de acceder es buscando «Editar plan de energía» en la lupa de la barra de tareas.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>8. ¿Qué son los archivos temporales y por qué se acumulan?</summary>
+    <div class="qa-a"><p>Son datos creados por programas y navegadores para realizar tareas puntuales. Una vez finalizada la tarea, a menudo no se borran solos, quedando olvidados y ocupando espacio valioso en el disco.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>9. ¿Es seguro vaciar la Papelera de Reciclaje a través del Sensor de Almacenamiento?</summary>
+    <div class="qa-a"><p>Sí, siempre y cuando no conserves en la Papelera archivos que planees recuperar posteriormente.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>10. ¿Por qué no se debe limpiar automáticamente la carpeta de Descargas sin revisar?</summary>
+    <div class="qa-a"><p>Porque en la carpeta de Descargas suelen guardarse archivos importantes, instaladores o documentos de trabajo que el usuario podría necesitar más adelante.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>11. ¿Qué diferencia hay entre Windows 10 y Windows 11 al buscar la pestaña de inicio?</summary>
+    <div class="qa-a"><p>En Windows 10 se encuentra como una pestaña superior llamada «Inicio» dentro del Administrador de Tareas. En Windows 11 se ubica en el menú lateral izquierdo bajo el nombre «Aplicaciones de arranque».</p></div>
+  </details>
+
+  <h2>Nivel Avanzado (12 a 22)</h2>
+
+  <details class="qa-item"><summary>12. ¿Cómo afecta la opción «Economizador» de energía al rendimiento de la CPU?</summary>
+    <div class="qa-a"><p>Reduce intencionalmente la frecuencia de reloj del procesador y deshabilita núcleos de procesamiento para consumir menos electricidad, lo que ralentiza notablemente la velocidad del equipo.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>13. ¿Qué impacto tiene seleccionar «Alto Rendimiento» en la batería de una laptop?</summary>
+    <div class="qa-a"><p>Mantiene el procesador preparado para funcionar a su capacidad máxima, lo que puede incrementar ligeramente el consumo de energía y reducir un poco la duración de la batería mientras no esté conectada a la toma de corriente.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>14. ¿Qué es la Programación de GPU Acelerada por Hardware (HAGS)?</summary>
+    <div class="qa-a"><p>Es una función avanzada que permite a la tarjeta gráfica administrar directamente su propia memoria de video (VRAM), liberando a la CPU de esa carga de trabajo y reduciendo la latencia gráfica.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>15. ¿Cómo reducen la latencia las «Optimizaciones para juegos en ventana»?</summary>
+    <div class="qa-a"><p>Modifican el modelo de presentación visual de las aplicaciones en ventana, utilizando un mecanismo de volteo más rápido (<em>flip model</em>) similar al del modo pantalla completa exclusiva.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>16. ¿Por qué la telemetría y el identificador de publicidad consumen recursos en segundo plano?</summary>
+    <div class="qa-a"><p>Porque ejecutan servicios que rastrean de forma continua el uso del sistema, recopilan métricas y realizan consultas a servidores externos a través de la red, ocupando procesador y ancho de banda.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>17. ¿Qué es la Caché del Sombreador de DirectX y cuándo conviene limpiarla?</summary>
+    <div class="qa-a"><p>Es un almacenamiento de efectos visuales procesados por la GPU. Conviene limpiarla si se experimentan errores gráficos o tras actualizar los controladores de la tarjeta de video.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>18. ¿Qué son los Archivos de Optimización de Distribución?</summary>
+    <div class="qa-a"><p>Son fragmentos de actualizaciones de Windows que tu equipo almacena para compartirlos con otros equipos de tu red local o de Internet. Su borrado libera gigabytes de espacio sin afectar al sistema.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>19. ¿Por qué es recomendable dejar habilitado el Antivirus/Seguridad de Windows en el inicio?</summary>
+    <div class="qa-a"><p>Porque garantiza que la protección en tiempo real contra programas maliciosos esté activa desde el momento en que el sistema operativo se enciende.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>20. ¿Cómo saber si una aplicación desconocida en el inicio es un proceso vital de Windows?</summary>
+    <div class="qa-a"><p>Haz clic derecho sobre la aplicación dentro del Administrador de Tareas y selecciona «Abrir ubicación del archivo» para verificar el fabricante legítimo del ejecutable.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>21. ¿Qué sucede si el Sensor de Almacenamiento se configura para ejecutarse solo cuando hay poco espacio libre?</summary>
+    <div class="qa-a"><p>Permanecerá inactivo sin consumir recursos de lectura/escritura en el disco hasta que el almacenamiento principal alcance un umbral crítico de saturación.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>22. ¿Cómo influyen los informes de errores de Windows en la acumulación de archivos basura?</summary>
+    <div class="qa-a"><p>Cada vez que un programa se bloquea, Windows genera reportes de diagnóstico y volcados de memoria que pueden llegar a ocupar varios gigabytes con el paso del tiempo.</p></div>
+  </details>
+
+  <h2>Nivel PRO (23 a 33)</h2>
+
+  <details class="qa-item"><summary>23. ¿Cuál es la diferencia técnica entre deshabilitar el arranque de una app en el Administrador de Tareas y el Administrador de Servicios (<code>services.msc</code>)?</summary>
+    <div class="qa-a"><p>El Administrador de Tareas controla los accesos directos de la carpeta de inicio del usuario y las claves de registro <code>Run</code>. El Administrador de Servicios controla servicios en segundo plano del kernel y procesos del sistema que operan bajo cuentas del sistema.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>24. ¿Cómo interactúa el plan de energía «Alto Rendimiento» con los estados de reposo de la CPU?</summary>
+    <div class="qa-a"><p>Desactiva el ingreso del procesador a estados profundos de ahorro energético, manteniendo los núcleos en estado activo con el escalado de frecuencia en su umbral máximo.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>25. ¿Qué cambio de arquitectura realiza HAGS entre la RAM y la VRAM?</summary>
+    <div class="qa-a"><p>Traslada la gestión del planificador de contexto gráfico de la memoria de sistema asignada al controlador de la CPU al procesador de comandos dedicado del chip de la GPU.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>26. ¿Cómo evitar el borrado indebido de datos mediante reglas en el Sensor de Almacenamiento?</summary>
+    <div class="qa-a"><p>Fijando explícitamente la directiva de la carpeta <em>Descargas</em> en «Nunca» y configurando exclusiones específicas en el menú de almacenamiento nativo.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>27. ¿Qué relación existe entre la degradación de un SSD y la saturación de archivos basura?</summary>
+    <div class="qa-a"><p>Las unidades SSD pierden velocidad de escritura cuando el espacio libre cae por debajo del 10-15 % debido a la sobrecarga del proceso de recolección de basura interno del controlador.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>28. ¿Cómo diagnosticar cuellos de botella en la CPU o Disco mediante el Administrador de Tareas?</summary>
+    <div class="qa-a"><p>En la pestaña <em>Rendimiento</em>, observa si la CPU se mantiene al 100 % de uso constante o si el tiempo de respuesta del disco supera los 50-100 ms, indicando saturación de operaciones de entrada y salida.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>29. ¿Qué impacto tienen las ofertas personalizadas en las llamadas de red en segundo plano?</summary>
+    <div class="qa-a"><p>Generan peticiones periódicas mediante las API de telemetría de Windows enviando paquetes de datos hacia servidores de métricas, consumiendo ancho de banda e hilos de ejecución.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>30. ¿De qué manera las Optimizaciones en Ventana mejoran el tiempo de fotograma en juegos?</summary>
+    <div class="qa-a"><p>Anulan la composición tradicional del Administrador de Ventanas del Escritorio (DWM) para las aplicaciones en ventana, permitiendo que la aplicación tome control directo del búfer de pantalla.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>31. ¿Cómo verificar el espacio ocupado por archivos temporales mediante PowerShell?</summary>
+    <div class="qa-a"><p>Ejecutando un comando de medición sobre la ruta <code>$env:TEMP</code> para obtener la suma exacta en bytes de la carpeta temporal del usuario activo.</p></div>
+  </details>
+
+  <details class="qa-item"><summary>32. ¿Qué hacer si tras cambiar al plan de «Alto Rendimiento» el equipo experimenta sobrecalentamiento?</summary>
+    <div class="qa-a"><p>Limpiar el polvo acumulado en los disipadores físicos del equipo y verificar en la configuración avanzada del plan de energía que la directiva de refrigeración del sistema esté configurada en «Activa».</p></div>
+  </details>
+
+  <details class="qa-item"><summary>33. ¿Cuáles son los riesgos de deshabilitar la memoria virtual pensando que acelerará la RAM?</summary>
+    <div class="qa-a"><p>Deshabilitar la memoria virtual provoca cierres inesperados de aplicaciones y errores de falta de memoria al superar la capacidad física instalada.</p></div>
+  </details>
+</section>
+
+<!-- ============ ERRORES ============ -->
+<section class="sec" data-t="ERRORES">
+  <h1>Errores comunes y solución de problemas</h1>
+
+  <h2>Tabla de solución de problemas</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Problema / Síntoma</th><th>Causa probable</th><th>Solución paso a paso</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>La batería de la laptop se agota muy rápido tras la optimización.</td>
+          <td>El plan de energía se fijó en <em>Alto rendimiento</em> de forma permanente durante el uso con batería.</td>
+          <td>Regresa a <em>Editar plan de energía</em> y selecciona el plan <em>Equilibrado</em> para cuando el equipo opere exclusivamente con batería.</td>
+        </tr>
+        <tr>
+          <td>Un programa necesario ya no se abre al encender el equipo.</td>
+          <td>Se deshabilitó por error la aplicación requerida en la pestaña de Inicio.</td>
+          <td>Abre el Administrador de Tareas (<code>Ctrl</code>+<code>Shift</code>+<code>Esc</code>), ve a <em>Aplicaciones de arranque</em>, ubica el programa, haz clic derecho y selecciona <em>Habilitar</em>.</td>
+        </tr>
+        <tr>
+          <td>La opción de Programación de GPU (HAGS) no aparece en Pantalla → Gráficos.</td>
+          <td>La tarjeta gráfica o sus controladores no son compatibles con esta función.</td>
+          <td>Actualiza el controlador oficial de tu tarjeta de video (NVIDIA, AMD o Intel) desde el sitio web oficial del fabricante.</td>
+        </tr>
+        <tr>
+          <td>El espacio de disco vuelve a llenarse en menos de una semana.</td>
+          <td>Actualizaciones pendientes de Windows acumulando archivos de distribución.</td>
+          <td>Vuelve a <em>Almacenamiento → Archivos temporales</em> y marca <em>Archivos de optimización de distribución</em> para purgar los instaladores antiguos.</td>
+        </tr>
+        <tr>
+          <td>El equipo se sobrecalienta tras cambiar al plan de alto rendimiento.</td>
+          <td>Polvo acumulado en los disipadores o directiva de refrigeración pasiva.</td>
+          <td>Limpia los ventiladores y, en <em>Configuración avanzada de energía → Administración de energía del procesador → Directiva de refrigeración del sistema</em>, selecciona <em>Activa</em>.</td>
+        </tr>
+        <tr>
+          <td>La búsqueda del Editor de políticas de grupo no está disponible.</td>
+          <td>Windows Home no incluye <code>gpedit.msc</code> de fábrica.</td>
+          <td>Usa el Editor del Registro (<code>regedit</code>) con precaución o aplica los ajustes desde Configuración. No instales activadores de terceros.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Errores que debes evitar</h2>
+  <ul>
+    <li><strong>Deshabilitar el antivirus al inicio:</strong> deja el equipo sin protección en tiempo real desde el encendido.</li>
+    <li><strong>Borrar la carpeta de Descargas automáticamente:</strong> puedes perder instaladores o documentos irrecuperables.</li>
+    <li><strong>Aplicar «limpiadores de registro» de terceros:</strong> provocan inestabilidad y no aportan mejoras medibles.</li>
+    <li><strong>Forzar el plan de Alto rendimiento siempre:</strong> en laptops sin cargador, la batería se agota antes y el equipo se calienta más.</li>
+    <li><strong>Deshabilitar la memoria virtual:</strong> Windows la necesita; sin ella, las aplicaciones se cierran solas al superar la RAM física.</li>
+    <li><strong>Vaciar la caché del sombreador DirectX sin motivo:</strong> tras hacerlo, los juegos tardarán más en cargar hasta regenerarla.</li>
+    <li><strong>Modificar claves del registro sin copia de seguridad:</strong> un error puede dejar el sistema inestable o impedir el arranque.</li>
+  </ul>
+
+  <h2>Qué NO hacer</h2>
+  <div class="callout danger">
+    <ul style="margin:.2em 0">
+      <li>No deshabilites controladores de audio, video o red desde el inicio.</li>
+      <li>No uses «optimizadores» que prometen liberar RAM en tiempo real: empeoran el rendimiento.</li>
+      <li>No desactives Windows Update de forma permanente: te quedarás sin parches de seguridad.</li>
+      <li>No apliques decenas de cambios de configuración a la vez: si algo falla, no sabrás qué fue.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ RESUMEN ============ -->
+<section class="sec" data-t="RESUMEN">
+  <h1>Resumen y lista de comprobación final</h1>
+
+  <h2>Las 7 ideas clave</h2>
+  <ol class="steps">
+    <li>Windows 10 y 11 ya incluyen todas las herramientas necesarias. No necesitas programas externos.</li>
+    <li>Antes de tocar nada, crea un Punto de Restauración.</li>
+    <li>Deshabilitar autostarts innecesarios reduce drásticamente el tiempo de encendido y el consumo de RAM.</li>
+    <li>El plan de energía <em>Alto rendimiento</em> mejora la respuesta inmediata, pero en laptops conviene alternarlo con <em>Equilibrado</em> al usar batería.</li>
+    <li>Desactivar telemetría, ofertas personalizadas e identificador de publicidad elimina procesos invisibles que consumen CPU y red.</li>
+    <li>HAGS delega la gestión de VRAM a la GPU y reduce la latencia gráfica.</li>
+    <li>El Sensor de Almacenamiento automatiza la limpieza segura; nunca dejes que borre la carpeta <em>Descargas</em>.</li>
+  </ol>
+
+  <h2>Lista de comprobación final</h2>
+  <ul class="checklist">
+    <li><input type="checkbox" id="ck1" data-key="ck1"><label for="ck1">He creado un Punto de Restauración antes de empezar.</label></li>
+    <li><input type="checkbox" id="ck2" data-key="ck2"><label for="ck2">He deshabilitado las aplicaciones de arranque innecesarias (manteniendo antivirus y controladores).</label></li>
+    <li><input type="checkbox" id="ck3" data-key="ck3"><label for="ck3">He configurado el plan de energía adecuado a mi tipo de uso.</label></li>
+    <li><input type="checkbox" id="ck4" data-key="ck4"><label for="ck4">He desactivado ofertas personalizadas e identificador de publicidad.</label></li>
+    <li><input type="checkbox" id="ck5" data-key="ck5"><label for="ck5">He activado HAGS y las optimizaciones para juegos en ventana (si mi GPU lo admite).</label></li>
+    <li><input type="checkbox" id="ck6" data-key="ck6"><label for="ck6">He activado el Sensor de Almacenamiento y verificado la directiva de Descargas.</label></li>
+    <li><input type="checkbox" id="ck7" data-key="ck7"><label for="ck7">He comprobado que no quedan procesos de telemetría innecesarios en ejecución.</label></li>
+    <li><input type="checkbox" id="ck8" data-key="ck8"><label for="ck8">El equipo arranca más rápido y responde con menor latencia.</label></li>
+  </ul>
+
+  <h2>Antes y después</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Antes</h3>
+      <ul>
+        <li>Arranque lento y ventilador ruidoso.</li>
+        <li>RAM saturada por procesos invisibles.</li>
+        <li>Anuncios y recomendaciones en Configuración.</li>
+        <li>Microtirones en juegos y videos.</li>
+        <li>Disco casi lleno por temporales olvidados.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Después</h3>
+      <ul>
+        <li>Arranque más rápido y sistema más silencioso.</li>
+        <li>Más RAM disponible para tus aplicaciones reales.</li>
+        <li>Interfaz limpia sin rastreo publicitario.</li>
+        <li>Menor latencia en juegos y multimedia.</li>
+        <li>Espacio liberado y mantenido con el Sensor de Almacenamiento.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FUENTES ============ -->
+<section class="sec" data-t="FUENTES">
+  <h1>Fuentes y documentación oficial</h1>
+  <p>Para garantizar la precisión técnica y la rigurosidad de este tutorial, se recomienda consultar la documentación técnica oficial de Microsoft y la referencia del autor.</p>
+
+  <ol class="steps">
+    <li>
+      <strong>Documentación Oficial de Microsoft Learn — Rendimiento y Optimización en Windows:</strong>
+      <span class="src-url">Guías de referencia sobre el Administrador de Tareas, planes de energía y administración del kernel de Windows.</span>
+    </li>
+    <li>
+      <strong>Soporte Técnico de Microsoft — Consejos para mejorar el rendimiento del equipo:</strong>
+      <span class="src-url">Guía oficial paso a paso para la gestión de inicio, almacenamiento y memoria del sistema.</span>
+    </li>
+    <li>
+      <strong>Microsoft Developer Network (MSDN) — Hardware-Accelerated GPU Scheduling (HAGS):</strong>
+      <span class="src-url">Especificaciones técnicas sobre la arquitectura de asignación de memoria gráfica y renderizado directo por GPU.</span>
+    </li>
+    <li>
+      <strong>Guía de Referencia de Rubén Sbarsky:</strong>
+      <span class="src-url">Tutorial en video sobre optimización nativa de Windows 10 y 11 con tan solo clic en herramientas nativas del sistema operativo.</span>
+    </li>
+  </ol>
+
+  <div class="callout">
+    <strong>Nota de honestidad intelectual:</strong> este tutorial reorganiza y explica el contenido de las fuentes citadas. No atribuye a Microsoft ni al autor original afirmaciones que no estén recogidas en dichas fuentes. Las comprobaciones prácticas descritas (pasos, resultados esperados) son reproducibles en Windows 10 y 11 actualizados a la fecha de creación del documento.
+  </div>
+</section>
+
+<!-- ============ CRÉDITOS ============ -->
+<section class="sec" data-t="CRÉDITOS">
+  <h1>Créditos</h1>
+
+  <div class="hero-svg" id="heroCred" aria-label="Ilustración animada del tema de optimización de Windows"></div>
+
+  <p>Ilustración animada: el emblema de Windows en el centro emite pulsos de energía hacia cuatro chips etiquetados como CPU, RAM, SSD y GPU, conectados por flujos luminosos mientras partículas orbitan a su alrededor. Representa la optimización nativa de Windows 10 y 11 sin programas de terceros.</p>
+
+  <div class="author-block">
+    <h2>Rubén Sbarsky</h2>
+    <p class="role">Autor del tutorial</p>
+  </div>
+
+  <p>Este tutorial transforma el material original en una experiencia interactiva autónoma, siguiendo la metodología Gauntlet: planificar, construir, auditar adversarialmente, corregir, verificar y entregar. Todos los contenidos, ilustraciones, animaciones e interacciones están contenidos en un único archivo HTML sin dependencias externas.</p>
+
+  <p><strong>Versión:</strong> V001</p>
+  <p><strong>Fecha de creación:</strong> 25/10/2026 — 06:56:13</p>
+  <p><strong>Archivo:</strong> tutorial_optimizacion_windows_V001.html</p>
+
+  <div class="callout ok">
+    <strong>Créditos adicionales:</strong> la estructura pedagógica, las 33 preguntas y respuestas, los proyectos prácticos, el glosario y las tablas de solución de problemas provienen del material fuente original. La traducción a HTML interactivo, el SVG animado y las funciones de la interfaz forman parte de esta edición.
+  </div>
+</section>
+
+</main>
+
+<!-- ============ TOOLBAR ============ -->
+<div id="toolbar" class="no-print">
+  <button id="btnTheme" title="Cambiar tema" aria-label="Cambiar entre tema oscuro y claro">◐</button>
+  <button id="btnFSUp" title="Aumentar letra" aria-label="Aumentar tamaño de letra">A+</button>
+  <button id="btnFSDown" title="Reducir letra" aria-label="Reducir tamaño de letra">A−</button>
+  <button id="btnPrint" title="Imprimir / Guardar como PDF" aria-label="Imprimir o guardar como PDF">🖨</button>
+  <button id="btnTop" title="Volver arriba" aria-label="Volver arriba">↑</button>
+</div>
+
+<!-- ============ SVG SOURCE (temporal) ============ -->
+<div id="svg-src" hidden>
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ttl-__U__ dsc-__U__" class="hero-img">
+  <title id="ttl-__U__">Ilustración animada de optimización de Windows: emblema central con pulsos de energía hacia chips de CPU, RAM, SSD y GPU.</title>
+  <desc id="dsc-__U__">Escena animada que representa la optimización nativa de Windows 10 y 11. Un emblema de Windows brillante en el centro emite pulsos y flujos de datos hacia cuatro chips etiquetados CPU, RAM, SSD y GPU. Partículas luminosas orbitan alrededor y anillos concéntricos refuerzan la idea de aceleración sin programas de terceros.</desc>
+  <defs>
+    <radialGradient id="bgG-__U__" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0c1a30"/>
+      <stop offset="55%" stop-color="#070f1f"/>
+      <stop offset="100%" stop-color="#04070f"/>
+    </radialGradient>
+    <linearGradient id="winG-__U__" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#00d4ff"/>
+    </linearGradient>
+    <radialGradient id="pulseGrad-__U__">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.85"/>
+      <stop offset="55%" stop-color="#38bdf8" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow-__U__" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <style>
+    .rotc-__U__{transform-box:view-box;transform-origin:center;animation:kfrot-__U__ linear infinite}
+    @keyframes kfrot-__U__{to{transform:rotate(360deg)}}
+    .rotcc-__U__{transform-box:view-box;transform-origin:center;animation:kfrotcc-__U__ linear infinite}
+    @keyframes kfrotcc-__U__{to{transform:rotate(-360deg)}}
+    .pulseAnim-__U__{transform-box:fill-box;transform-origin:center;animation:kfpulse-__U__ 2.6s ease-in-out infinite}
+    @keyframes kfpulse-__U__{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.14);opacity:.95}}
+    .twinkle-__U__{animation:kftw-__U__ 3s ease-in-out infinite}
+    @keyframes kftw-__U__{0%,100%{opacity:.25}50%{opacity:1}}
+    .stream-__U__{animation:kfdash-__U__ 1.2s linear infinite}
+    @keyframes kfdash-__U__{to{stroke-dashoffset:-24}}
+    .hoverA-__U__{transform-box:fill-box;transform-origin:center;animation:kfhover-__U__ 4s ease-in-out infinite}
+    @keyframes kfhover-__U__{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .ringA-__U__{transform-box:fill-box;transform-origin:center;animation:kfring-__U__ 3s ease-out infinite}
+    @keyframes kfring-__U__{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.2);opacity:0}}
+    .ringB-__U__{transform-box:fill-box;transform-origin:center;animation:kfring-__U__ 3s ease-out infinite;animation-delay:1.5s}
+    @media (prefers-reduced-motion: reduce){
+      .rotc-__U__,.rotcc-__U__,.pulseAnim-__U__,.twinkle-__U__,.stream-__U__,.hoverA-__U__,.ringA-__U__,.ringB-__U__{animation:none!important}
+    }
+  </style>
+
+  <rect width="800" height="500" fill="url(#bgG-__U__)"/>
+
+  <!-- Estrellas de fondo -->
+  <g fill="#7dd3fc">
+    <circle cx="60" cy="60" r="1.4" class="twinkle-__U__" style="animation-delay:0s"/>
+    <circle cx="140" cy="140" r="1" class="twinkle-__U__" style="animation-delay:.6s"/>
+    <circle cx="720" cy="90" r="1.6" class="twinkle-__U__" style="animation-delay:1.2s"/>
+    <circle cx="680" cy="180" r="1" class="twinkle-__U__" style="animation-delay:1.8s"/>
+    <circle cx="90" cy="400" r="1.4" class="twinkle-__U__" style="animation-delay:.9s"/>
+    <circle cx="700" cy="420" r="1.2" class="twinkle-__U__" style="animation-delay:.3s"/>
+    <circle cx="200" cy="60" r="1" class="twinkle-__U__" style="animation-delay:1.5s"/>
+    <circle cx="620" cy="60" r="1.2" class="twinkle-__U__" style="animation-delay:2.1s"/>
+    <circle cx="50" cy="250" r="1" class="twinkle-__U__" style="animation-delay:.4s"/>
+    <circle cx="760" cy="280" r="1.4" class="twinkle-__U__" style="animation-delay:1.7s"/>
+  </g>
+
+  <!-- Anillos concéntricos -->
+  <g fill="none" stroke="#1e3a5f" stroke-width="1">
+    <circle cx="400" cy="250" r="130" opacity="0.5"/>
+    <circle cx="400" cy="250" r="180" opacity="0.35"/>
+    <circle cx="400" cy="250" r="230" opacity="0.22"/>
+  </g>
+
+  <!-- Anillos pulsantes -->
+  <circle cx="400" cy="250" r="90" fill="none" stroke="#00d4ff" stroke-width="1.5" class="ringA-__U__"/>
+  <circle cx="400" cy="250" r="90" fill="none" stroke="#00d4ff" stroke-width="1.5" class="ringB-__U__"/>
+
+  <!-- Flujos de datos hacia los cuatro chips -->
+  <g stroke="#38bdf8" stroke-width="1.6" fill="none" stroke-dasharray="4 8" opacity="0.85">
+    <path d="M400 250 L400 96" class="stream-__U__"/>
+    <path d="M400 250 L622 250" class="stream-__U__" style="animation-delay:.2s"/>
+    <path d="M400 250 L400 404" class="stream-__U__" style="animation-delay:.4s"/>
+    <path d="M400 250 L178 250" class="stream-__U__" style="animation-delay:.6s"/>
+  </g>
+
+  <!-- Partículas orbitales -->
+  <g class="rotc-__U__" style="animation-duration:14s">
+    <circle cx="400" cy="110" r="3.5" fill="#00d4ff" filter="url(#glow-__U__)"/>
+    <circle cx="690" cy="250" r="3" fill="#38bdf8" filter="url(#glow-__U__)"/>
+  </g>
+  <g class="rotcc-__U__" style="animation-duration:20s">
+    <circle cx="400" cy="390" r="4" fill="#7dd3fc" filter="url(#glow-__U__)"/>
+    <circle cx="110" cy="250" r="3" fill="#00d4ff" filter="url(#glow-__U__)"/>
+  </g>
+  <g class="rotc-__U__" style="animation-duration:26s">
+    <circle cx="400" cy="80" r="2.5" fill="#00d4ff"/>
+    <circle cx="720" cy="250" r="2" fill="#38bdf8"/>
+    <circle cx="400" cy="420" r="2.5" fill="#00d4ff"/>
+    <circle cx="80" cy="250" r="2" fill="#38bdf8"/>
+  </g>
+
+  <!-- Halo central -->
+  <circle cx="400" cy="250" r="105" fill="url(#pulseGrad-__U__)" class="pulseAnim-__U__"/>
+  <circle cx="400" cy="250" r="100" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Emblema de Windows: 4 paneles -->
+  <g filter="url(#glow-__U__)">
+    <rect x="356" y="206" width="40" height="40" rx="5" fill="url(#winG-__U__)"/>
+    <rect x="404" y="206" width="40" height="40" rx="5" fill="url(#winG-__U__)"/>
+    <rect x="356" y="254" width="40" height="40" rx="5" fill="url(#winG-__U__)"/>
+    <rect x="404" y="254" width="40" height="40" rx="5" fill="url(#winG-__U__)"/>
+  </g>
+
+  <!-- CPU (arriba) -->
+  <g class="hoverA-__U__" style="animation-delay:0s">
+    <g transform="translate(400 70)">
+      <rect x="-26" y="-26" width="52" height="52" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <rect x="-14" y="-14" width="28" height="28" rx="3" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="-26" y1="-10" x2="-32" y2="-10" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="-26" y1="10" x2="-32" y2="10" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="26" y1="-10" x2="32" y2="-10" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="26" y1="10" x2="32" y2="10" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="0" y="42" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#7dd3fc" letter-spacing="1">CPU</text>
+    </g>
+  </g>
+
+  <!-- RAM (derecha) -->
+  <g class="hoverA-__U__" style="animation-delay:1s">
+    <g transform="translate(650 250)">
+      <rect x="-28" y="-18" width="56" height="36" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <line x1="-20" y1="-8" x2="20" y2="-8" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="-20" y1="0" x2="20" y2="0" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="-20" y1="8" x2="20" y2="8" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="0" y="36" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#7dd3fc" letter-spacing="1">RAM</text>
+    </g>
+  </g>
+
+  <!-- SSD (abajo) -->
+  <g class="hoverA-__U__" style="animation-delay:2s">
+    <g transform="translate(400 430)">
+      <rect x="-28" y="-18" width="56" height="36" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <circle cx="-12" cy="0" r="5" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+      <rect x="0" y="-8" width="20" height="16" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="0" y="36" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#7dd3fc" letter-spacing="1">SSD</text>
+    </g>
+  </g>
+
+  <!-- GPU (izquierda) -->
+  <g class="hoverA-__U__" style="animation-delay:1.5s">
+    <g transform="translate(150 250)">
+      <rect x="-28" y="-18" width="56" height="36" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <circle cx="-12" cy="0" r="7" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+      <circle cx="-12" cy="0" r="2.5" fill="#38bdf8"/>
+      <rect x="2" y="-8" width="18" height="16" rx="2" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+      <text x="0" y="36" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#7dd3fc" letter-spacing="1">GPU</text>
+    </g>
+  </g>
+
+  <!-- Etiqueta inferior -->
+  <text x="400" y="485" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" fill="#64748b" letter-spacing="2">OPTIMIZACIÓN NATIVA · WINDOWS 10 &amp; 11</text>
+</svg>
+</div>
+
+<script>
+/* ============================================================
+   OPTIMIZACIÓN WINDOWS — V001
+   JavaScript autónomo. Sin dependencias externas.
+   ============================================================ */
+
+(function () {
+  'use strict';
+
+  /* ---------- Referencias globales ---------- */
+  const sections = Array.from(document.querySelectorAll('.sec'));
+  const navchips = Array.from(document.querySelectorAll('#navchips .chip'));
+  const drawer = document.getElementById('dr');
+  const mb = document.getElementById('mb');
+  const reduceMotion = window.matchMedia &&
+                       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Extraer plantilla SVG y eliminar la fuente ---------- */
+  let SVG_TPL = '';
+  (function extractSVG() {
+    const src = document.getElementById('svg-src');
+    if (!src) return;
+    SVG_TPL = src.innerHTML.trim();
+    src.remove();
+  })();
+
+  /* ---------- Montar SVG con ID único ---------- */
+  function mountSVG(containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (el.querySelector('svg, img')) return;
+    const uid = containerId + '_' + Math.random().toString(36).slice(2, 9);
+    try {
+      el.innerHTML = SVG_TPL.replace(/__U__/g, uid);
+      const svg = el.querySelector('svg');
+      if (!svg) throw new Error('SVG vacío');
+      if (reduceMotion && typeof svg.pauseAnimations === 'function') {
+        try { svg.pauseAnimations(); } catch (e) {}
+      }
+    } catch (err) {
+      /* Fallback: SVG estático como imagen data: URI.
+         NO se afirma compatibilidad universal: se documenta como red de seguridad. */
+      try {
+        const dataUri = 'data:image/svg+xml;utf8,' +
+          encodeURIComponent(SVG_TPL.replace(/__U__/g, 'f' + uid));
+        el.innerHTML = '<img alt="Ilustración de optimización de Windows" ' +
+          'style="display:block;width:100%;height:100%" src="' + dataUri + '">';
+      } catch (e2) {
+        el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;' +
+          'height:100%;color:var(--muted);padding:20px;text-align:center">' +
+          'Ilustración no disponible.</div>';
+      }
+    }
+  }
+
+  /* ---------- Ir a sección (SPA) ---------- */
+  function go(i, scroll) {
+    if (typeof scroll === 'undefined') scroll = true;
+    if (i < 0 || i >= sections.length) i = 0;
+    sections.forEach((s, j) => s.classList.toggle('on', j === i));
+    navchips.forEach((b, j) => b.classList.toggle('on', j === i));
+    drawer.querySelectorAll('a').forEach((a, j) => a.classList.toggle('on', j === i));
+
+    /* Montar SVG de la pestaña activa */
+    if (i === 0) mountSVG('heroHome');
+    if (i === sections.length - 1) mountSVG('heroCred');
+
+    /* Persistir pestaña */
+    try { localStorage.setItem('optwin_tab', String(i)); } catch (e) {}
+
+    /* Volver arriba */
+    if (scroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Actualizar título del documento */
+    const titulo = sections[i].dataset.t || 'Tutorial';
+    document.title = titulo + ' — Optimización Windows 10 y 11';
+  }
+
+  /* ---------- Drawer: abrir / cerrar ---------- */
+  function tg(v) {
+    if (typeof v === 'boolean') drawer.classList.toggle('o', v);
+    else drawer.classList.toggle('o');
+    const abierto = drawer.classList.contains('o');
+    mb.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    if (abierto) drawer.removeAttribute('inert');
+    else drawer.setAttribute('inert', '');
+  }
+
+  /* ---------- Construir enlaces del drawer ---------- */
+  function buildDrawer() {
+    drawer.innerHTML = '';
+    sections.forEach((s, i) => {
+      const a = document.createElement('a');
+      const titulo = s.dataset.t || (s.querySelector('h2') ? s.querySelector('h2').textContent : 'Sección');
+      a.textContent = (i ? i + '. ' : '') + titulo;
+      a.href = '#';
+      a.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        go(i, true);
+        tg(false);
+      });
+      drawer.appendChild(a);
+    });
+  }
+
+  /* ---------- Eventos de navegación ---------- */
+  navchips.forEach((b) => {
+    b.addEventListener('click', () => go(parseInt(b.dataset.i, 10), true));
+  });
+  mb.addEventListener('click', () => tg());
+  const ix = document.getElementById('ix');
+  if (ix) ix.addEventListener('click', () => tg(true));
+
+  /* Cerrar con Esc */
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') tg(false);
+  });
+
+  /* Cerrar al pulsar fuera */
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#dr, #mb, #ix')) tg(false);
+  });
+
+  /* ---------- Comprobación periódica de SVG vacíos ---------- */
+  setInterval(() => {
+    ['heroHome', 'heroCred'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.offsetParent === null) return; /* oculto */
+      if (!el.querySelector('svg, img')) mountSVG(id);
+    });
+  }, 2000);
+
+  /* ---------- Tema claro / oscuro ---------- */
+  const btnTheme = document.getElementById('btnTheme');
+  function applyTheme(t) {
+    document.body.classList.toggle('light', t === 'light');
+    try { localStorage.setItem('optwin_theme', t); } catch (e) {}
+    btnTheme.textContent = t === 'light' ? '☀' : '◐';
+    btnTheme.setAttribute('aria-label', t === 'light' ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro');
+  }
+  let theme = 'dark';
+  try { theme = localStorage.getItem('optwin_theme') || 'dark'; } catch (e) {}
+  applyTheme(theme);
+  btnTheme.addEventListener('click', () => {
+    theme = document.body.classList.contains('light') ? 'dark' : 'light';
+    applyTheme(theme);
+  });
+
+  /* ---------- Tamaño de letra ---------- */
+  const sizes = [14, 16, 18, 20];
+  let fsIdx = 1;
+  try { fsIdx = parseInt(localStorage.getItem('optwin_fs') || '1', 10); } catch (e) {}
+  if (isNaN(fsIdx) || fsIdx < 0 || fsIdx >= sizes.length) fsIdx = 1;
+  function applyFS() {
+    document.documentElement.style.fontSize = sizes[fsIdx] + 'px';
+    try { localStorage.setItem('optwin_fs', String(fsIdx)); } catch (e) {}
+  }
+  applyFS();
+  document.getElementById('btnFSUp').addEventListener('click', () => {
+    if (fsIdx < sizes.length - 1) { fsIdx++; applyFS(); }
+  });
+  document.getElementById('btnFSDown').addEventListener('click', () => {
+    if (fsIdx > 0) { fsIdx--; applyFS(); }
+  });
+
+  /* ---------- Volver arriba ---------- */
+  document.getElementById('btnTop').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---------- Barra de progreso de lectura ---------- */
+  const progbar = document.getElementById('progbar');
+  function updateProgress() {
+    const doc = document.documentElement;
+    const total = doc.scrollHeight - window.innerHeight;
+    const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+    progbar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+
+  /* ---------- Copiar ---------- */
+  function showToast(msg) {
+    let el = document.getElementById('toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.opacity = '1';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Copiado'); }
+    catch (e) { alert('No se pudo copiar. Selecciona el texto manualmente.'); }
+    ta.remove();
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => showToast('Copiado'))
+        .catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  window.copyEl = function (id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    copyText(el.innerText);
+  };
+
+  /* ---------- Búsqueda en Q&A ---------- */
+  const qaSearch = document.getElementById('qaSearch');
+  if (qaSearch) {
+    qaSearch.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.qa-item').forEach((item) => {
+        const coincide = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
+        item.style.display = coincide ? '' : 'none';
+      });
+    });
+  }
+
+  /* ---------- Checklists con persistencia ---------- */
+  document.querySelectorAll('input[type=checkbox][data-key]').forEach((cb) => {
+    const key = 'optwin_chk_' + cb.dataset.key;
+    try {
+      if (localStorage.getItem(key) === '1') cb.checked = true;
+    } catch (e) {}
+    cb.addEventListener('change', () => {
+      try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {}
+    });
+  });
+
+  /* ---------- Impresión / PDF ---------- */
+  let openStates = [];
+  document.getElementById('btnPrint').addEventListener('click', () => {
+    /* Asegurar SVGs montados */
+    mountSVG('heroHome');
+    mountSVG('heroCred');
+    /* Recordar y abrir todos los details */
+    openStates = [];
+    document.querySelectorAll('details').forEach((d) => {
+      openStates.push({ el: d, wasOpen: d.open });
+      d.open = true;
+    });
+    setTimeout(() => {
+      try { window.print(); }
+      catch (e) {
+        alert('Abre este archivo directamente en el navegador y utiliza Ctrl+P o Cmd+P');
+      }
+    }, 120);
+  });
+  window.addEventListener('afterprint', () => {
+    openStates.forEach(({ el, wasOpen }) => { el.open = wasOpen; });
+    openStates = [];
+  });
+
+  /* ---------- Inicialización ---------- */
+  buildDrawer();
+  let savedTab = 0;
+  try { savedTab = parseInt(localStorage.getItem('optwin_tab') || '0', 10); } catch (e) {}
+  if (isNaN(savedTab) || savedTab < 0 || savedTab >= sections.length) savedTab = 0;
+  go(savedTab, false);
+  /* Montar SVG de INICIO inmediatamente */
+  mountSVG('heroHome');
+  /* Refrescar el progreso al cargar */
+  window.addEventListener('load', updateProgress);
+
+  /* Exponer go globalmente para onclick de botones inline */
+  window.go = go;
+})();
+</script>
+
+</body>
+</html>
